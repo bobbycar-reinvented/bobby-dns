@@ -1,8 +1,8 @@
-const dns2 = require('dns2');
-
-require('dotenv').config();
-
+import dns2 from 'dns2';
 const { Packet } = dns2;
+
+import { config as dotenv_config } from 'dotenv';
+dotenv_config();
 
 const allowed_users = ["comred", "feedc0de", "peter", "mick", "greyhash", "relay", "seatbot", "relay_comred", "relay_realraum", "comred_new", "testdevice", "gabor"];
 
@@ -11,11 +11,11 @@ const zone_id = process.env.CLOUDFLARE_ZONE_ID;
 
 const server = dns2.createServer({
     udp: true,
-    handle: dnsHandle
+    handle: dnsHandle,
 });
 
-const cloudflare = require('cloudflare');
-const cf = new cloudflare({
+import Cloudflare from 'cloudflare';
+const cf = new Cloudflare({
     token: process.env.CLOUDFLARE_TOKEN
 });
 
@@ -39,8 +39,13 @@ delete_all();
 server.listen({
     udp: {
         port: 53,
-        address: process.env.DNS_SERVER_IP
+        address: process.env.DNS_SERVER_IP,
+        type: "udp4",
     }
+}).then(() => {
+    console.log('server started');
+}).catch((err) => {
+    console.log('server error', err);
 });
 
 server.on('error', (err) => {
@@ -100,6 +105,8 @@ function expandIPV6(ipv6) {// expand :: to 0000 and check for length
     if (typeof ipv6 === 'undefined' || ipv6 === null) {
         return null;
     }
+
+    let solution = '';
 
     ipv6 = replaceAll(ipv6, '-', ':');
 
@@ -213,6 +220,7 @@ function createDNSEntryOnCloudflare(ip, username, type, is_global) { // ip can b
 
 
 async function dnsHandle(request, send, rinfo) {
+    console.log("DNS request from " + rinfo.address + ":" + rinfo.port + " for " + request.questions[0].name);
     try {
         const response = Packet.createResponseFromRequest(request);
         const [question] = request.questions;

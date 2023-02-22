@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "@types/dns2": "^2.0.2",
     "cloudflare": "^2.9.1",
-    "dns2": "^2.0.1"
-  }
+    "dns2": "^2.0.1",
+    "dotenv": "^16.0.3"
+  },
+  "type": "module"
 }
